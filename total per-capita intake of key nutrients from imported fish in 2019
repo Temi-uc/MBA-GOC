@@ -1,0 +1,22 @@
+import pandas as pd
+
+df = pd.read_csv('foreign_consumed_nutrient_data_2019.csv', encoding='ISO-8859-1')
+
+nutrients = ['calcium_mg', 'iron_mg', 'protein_g', 'fattyacids_g', 'vitamina_mcg', 'vitaminb12_mcg', 'zinc_mg']
+
+country_columns = df.columns.difference(['sciname'] + nutrients)
+
+results = pd.DataFrame(columns=['country'] + nutrients)
+
+for country in country_columns:
+    country_data = {'country': country}
+    
+    for nutrient in nutrients:
+        total_nutrient = (df[country] * df[nutrient] / 0.1).sum()
+        country_data[nutrient] = total_nutrient
+
+    results = pd.concat([results, pd.DataFrame([country_data])], ignore_index=True)
+
+results.to_csv('imported_import_percapita_nutrients_2019.csv', index=False)
+
+print(results)
