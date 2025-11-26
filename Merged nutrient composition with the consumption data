@@ -1,0 +1,9 @@
+import pandas as pd
+
+categorized_data = pd.read_csv('consumed_fish_foreign_2019.csv')
+
+nutrient_data = pd.read_csv('nutrient.csv')
+
+merged_data = pd.merge(categorized_data, nutrient_data, on='sciname', how='inner')
+
+merged_data.to_csv('foreign_consumed_nutrient_data_2019.csv', index=False)
