@@ -1,0 +1,12 @@
+import pandas as pd
+
+df = pd.read_parquet('part-0.parquet_2019')
+
+source = [
+    'foreign step 2', 'foreign step 1'
+]
+dom_df = df[df['consumption_source'].isin(source)]
+
+print(dom_df.head())
+
+dom_df.to_csv('foreign_data_2019.csv')
