@@ -1,0 +1,109 @@
+import pandas as pd
+
+df = pd.read_csv('prod.csv', encoding='ISO-8859-1' )
+
+df_algeria = df[df['iso3c'] == 'DZA']
+
+print(df_algeria.head())
+
+df_algeria.to_csv('DZA_production.csv', index=False)
+_______________________________________________________________________________________________________________________________________________
+import pandas as pd
+
+df = pd.read_csv('DZA_production.csv', encoding='ISO-8859-1')
+
+df_algeria = df[df['method'] == 'aquaculture']
+
+sum_live_weight_dza = df_algeria.groupby(['sciname', 'year'])['live_weight_t'].sum().reset_index()
+
+pivot_live_weight_dza = sum_live_weight_dza.pivot_table(
+    index='sciname',           
+    columns='year',            
+    values='live_weight_t',    
+    aggfunc='sum',             
+    fill_value=0               
+).reset_index()
+
+print("Transposed sum of live weight for each species by year")
+print(pivot_live_weight_dza)
+
+pivot_live_weight_dza.to_csv('DZA_aquaculture.csv', index=False)
+______________________________________________________________________________________________________________________________________________________
+import pandas as pd
+
+categorized_data = pd.read_csv('DZA_aquaculture.csv')
+nutrient_data = pd.read_csv('nutrient.csv')
+
+merged_data = pd.merge(categorized_data, nutrient_data, on='sciname', how='inner')
+
+merged_data.to_csv('DZA_aquaculture_nutrient_data.csv', index=False)
+_____________________________________________________________________________________________________________________________________________________
+
+import pandas as pd
+
+df = pd.read_csv('DZA_aquaculture_nutrient_data.csv', encoding='ISO-8859-1')
+
+years = [str(year) for year in range(1996, 2021)]
+nutrients = ['calcium_mg', 'iron_mg', 'protein_g', 'fattyacids_g', 'vitamina_mcg', 'vitaminb12_mcg', 'zinc_mg']
+
+
+total_nutrient_data = []
+
+for year in years:
+   
+    year_data = {'Year': year}
+    
+    for nutrient in nutrients:
+        nutrient_values = df[year] * df[nutrient] / 0.0001  # per 0.0001 tonnes
+        total_nutrient = nutrient_values.sum() #/ gram_to_tonne  # Convert from tonnes to grams
+        
+        year_data[nutrient] = total_nutrient
+    
+    total_nutrient_data.append(year_data)
+
+total_nutrient_df = pd.DataFrame(total_nutrient_data)
+
+total_nutrient_df.to_csv('DZA_aquaculture_nutrients_total.csv', index=False)
+
+print(total_nutrient_df)
+_______________________________________________________________________________________________________________________________________________________________
+import pandas as pd
+
+categorized_data = pd.read_csv('DZA_aquaculture_nutrients_total.csv', encoding='ISO-8859-1')
+nutrient_data = pd.read_csv('DZA_Population.csv')
+
+merged_data = pd.merge(categorized_data, nutrient_data, on='Year', how='inner')
+
+merged_data.to_csv('population_aquaculture_DZA.csv', index=False)
+_________________________________________________________________________________________________________________________________________________________________
+import pandas as pd
+
+df = pd.read_csv('population_aquaculture_DZA.csv')
+
+years = [str(year) for year in range(1996, 2021)]
+nutrients = ['calcium_mg', 'iron_mg', 'protein_g', 'fattyacids_g', 'vitamina_mcg', 'vitaminb12_mcg', 'zinc_mg']
+population_column = 'Total population'
+
+table = []
+
+for year in years:
+    year_data = df[df['Year'] == int(year)]
+    
+    year_nutrient_data = {'Year': year}
+    
+    for nutrient in nutrients:
+       
+        nutrient_values = year_data[nutrient]
+        
+        avg_nutrient_per_capita = nutrient_values.sum() / year_data[population_column].sum() 
+        avg_nutrient_per_capita_day = avg_nutrient_per_capita 
+       
+        year_nutrient_data[nutrient] = avg_nutrient_per_capita_day
+    
+    table.append(year_nutrient_data)
+
+data_df = pd.DataFrame(table)
+
+data_df.to_csv('DZA_aquaculture_kg_per_capita.csv', index=False)
+
+print(data_df)
