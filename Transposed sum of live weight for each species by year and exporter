@@ -1,0 +1,15 @@
+df = pd.read_csv('foreign_consumed_data_2019.csv')
+
+sum_live_weight = df.groupby(['sciname', 'consumer_iso3c'])['consumption_percap_live_kg'].sum().reset_index()
+
+pivot_live_weight = sum_live_weight.pivot_table(
+    index='sciname',           
+    columns='consumer_iso3c',           
+    values='consumption_percap_live_kg',   
+    aggfunc='sum',             
+    fill_value=0              
+).reset_index()
+
+print(pivot_live_weight)
+
+pivot_live_weight.to_csv('consumed_fish_foreign_2019.csv', index=False)
