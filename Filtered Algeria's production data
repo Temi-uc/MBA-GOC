@@ -1,0 +1,9 @@
+import pandas as pd
+
+df = pd.read_csv('prod.csv', encoding='ISO-8859-1' )
+
+df_algeria = df[df['iso3c'] == 'DZA']
+
+print(df_algeria.head())
+
+df_algeria.to_csv('DZA_production.csv', index=False)
