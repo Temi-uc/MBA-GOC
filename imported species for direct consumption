@@ -1,0 +1,18 @@
+import pandas as pd
+
+df = pd.read_csv('foreign_data_2019.csv')
+
+countries = [
+    'BEN', 'CIV', 'GMB', 'GHA', 'GIN', 'GNB', 'LBR', 'NGA', 'SEN', 'SLE', 'TGO',
+    'EGY', 'TUN', 'UGA', 'TZA', 'MRT', 'ZAF', 'LBY', 'MOZ', 'NAM',
+    'GAB', 'CMR', 'CPV', 'MAR', 'COD', 'COG', 'AGO', 'DJI', 'DZA', 'KEN', 'MDG',
+    'MUS', 'SYC', 'SDN', 'SOM', 'ERI'
+]
+
+dom_df = df[df['consumer_iso3c'].isin(countries)]
+
+cons_df= dom_df[dom_df['end_use'] == 'direct human consumption']
+
+print(cons_df.head())
+
+cons_df.to_csv('foreign_consumed_data_2019.csv', index=False)
